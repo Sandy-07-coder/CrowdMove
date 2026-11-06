@@ -27,6 +27,7 @@ function RootRouter() {
   if (!user) return <Login />;
   if (user.role === 'admin') return <AdminDashboard />;
   if (user.role === 'driver') return <DriverDashboard />;
+  if (user.role === 'conductor') return <ConductorScanner />;
   return <PassengerDashboard />;
 }
 

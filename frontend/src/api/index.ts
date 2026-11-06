@@ -246,13 +246,22 @@ export const busApi = {
     ),
 };
 
+export interface ScanResultResponse {
+  success: boolean;
+  message: string;
+  current_passengers: number;
+  fare: number;
+  new_balance?: number;
+  bus_id?: number;
+}
+
 export const passengerApi = {
   getCard: (passengerId: number) =>
     api.get<SmartCard>(`/passengers/card/${passengerId}`),
   getTransactions: (cardId: number) =>
     api.get<Transaction[]>(`/passengers/transactions/${cardId}`),
   scan: (cardNumber: string, busId: number, action: string, stopId?: number) =>
-    api.post<{ success: boolean; message: string; current_passengers: number; fare: number }>(
+    api.post<ScanResultResponse>(
       '/passengers/scan', { card_number: cardNumber, bus_id: busId, action, stop_id: stopId }),
   recharge: (cardNumber: string, amount: number) =>
     api.post<{ success: boolean; new_balance: number }>(

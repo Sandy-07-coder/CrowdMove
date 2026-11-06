@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   busApi, dashboardApi, predictionsApi, simulationApi,
@@ -296,15 +297,19 @@ export default function AdminDashboard() {
       <RoleNavbar />
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-12 z-20">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 rounded-lg p-2">
+          <Link
+            to="/admin"
+            title="SEERPAYANAM Control Center"
+            className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="bg-blue-600 rounded-lg p-2 shadow-xs group-hover:shadow-md transition-shadow">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">SEERPAYANAM Control Center</h1>
+              <h1 className="text-lg font-bold text-gray-900 leading-tight">SEERPAYANAM Control Center</h1>
               <p className="text-xs text-gray-500">Admin: {user?.name}</p>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />

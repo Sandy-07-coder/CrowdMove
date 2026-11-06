@@ -39,8 +39,13 @@ export default function RoleNavbar() {
     return (
       <nav className="bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 text-xs sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto">
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg text-white shadow-sm">
+          {/* Admin Identity Badge — Clickable */}
+          <Link
+            to="/admin"
+            title="SEERPAYANAM Admin Dashboard"
+            className="flex items-center gap-2 shrink-0 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg text-white shadow-sm group-hover:shadow-md transition-shadow">
               <Crown className="w-4 h-4 text-yellow-300" />
             </div>
             <div>
@@ -49,7 +54,7 @@ export default function RoleNavbar() {
                 MASTER ADMIN ACCESS
               </span>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-1.5 shrink-0">
             {adminNavItems.map((item) => {
@@ -94,17 +99,21 @@ export default function RoleNavbar() {
     return (
       <nav className="bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 text-xs sticky top-0 z-50 shadow-sm">
         <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="bg-emerald-600 p-1.5 rounded-lg text-white">
+          <Link
+            to="/passenger"
+            title="SEERPAYANAM Commuter Portal"
+            className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="bg-emerald-600 p-1.5 rounded-lg text-white shadow-sm group-hover:shadow-md transition-shadow">
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-gray-900 text-sm">MTC Smart Pass</span>
+              <span className="font-bold text-gray-900 text-sm">SEERPAYANAM</span>
               <span className="text-[10px] text-emerald-700 ml-1.5 font-medium px-1.5 py-0.5 bg-emerald-50 rounded border border-emerald-200">
-                Commuter Portal
+                Smart Pass
               </span>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-700 font-medium hidden sm:inline">
@@ -113,7 +122,7 @@ export default function RoleNavbar() {
             <button
               onClick={logout}
               title="Logout"
-              className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px]"
+              className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
             >
               <LogOut className="w-3 h-3" /> Logout
             </button>
@@ -127,17 +136,21 @@ export default function RoleNavbar() {
     return (
       <nav className="bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 text-xs sticky top-0 z-50 shadow-sm">
         <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="bg-amber-600 p-1.5 rounded-lg text-white">
+          <Link
+            to="/driver"
+            title="SEERPAYANAM Driver HUD"
+            className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="bg-amber-600 p-1.5 rounded-lg text-white shadow-sm group-hover:shadow-md transition-shadow">
               <Navigation className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-gray-900 text-sm">MTC Driver HUD</span>
+              <span className="font-bold text-gray-900 text-sm">SEERPAYANAM</span>
               <span className="text-[10px] text-amber-700 ml-1.5 font-medium px-1.5 py-0.5 bg-amber-50 rounded border border-amber-200">
-                In-Cab Console
+                Driver HUD
               </span>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-700 font-medium hidden sm:inline">
@@ -146,7 +159,7 @@ export default function RoleNavbar() {
             <button
               onClick={logout}
               title="Logout"
-              className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px]"
+              className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
             >
               <LogOut className="w-3 h-3" /> Logout
             </button>
@@ -159,22 +172,26 @@ export default function RoleNavbar() {
   return (
     <nav className="bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-2 text-xs sticky top-0 z-50 shadow-sm">
       <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="bg-cyan-600 p-1.5 rounded-lg text-white">
+        <Link
+          to="/scanner"
+          title="SEERPAYANAM Conductor ETM"
+          className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer group"
+        >
+          <div className="bg-cyan-600 p-1.5 rounded-lg text-white shadow-sm group-hover:shadow-md transition-shadow">
             <Camera className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-gray-900 text-sm">MTC Conductor ETM</span>
+            <span className="font-bold text-gray-900 text-sm">SEERPAYANAM</span>
             <span className="text-[10px] text-cyan-700 ml-1.5 font-medium px-1.5 py-0.5 bg-cyan-50 rounded border border-cyan-200">
-              Terminal
+              Conductor ETM
             </span>
           </div>
-        </div>
+        </Link>
 
         {user && (
           <button
             onClick={logout}
-            className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px]"
+            className="px-2.5 py-1 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-lg border border-gray-200 transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
           >
             <LogOut className="w-3 h-3" /> Logout
           </button>

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Camera, ScanLine, ArrowRight, Zap, Smartphone, KeyRound } from 'lucide-react';
+import { ScanLine, ArrowRight, Zap, Smartphone } from 'lucide-react';
 
 export default function ConductorLogin() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [identifier, setIdentifier] = useState('conductor@crowdmove.in');
+  const [identifier, setIdentifier] = useState('conductor@seerpayanam.in');
   const [password, setPassword] = useState('test123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,8 +18,22 @@ export default function ConductorLogin() {
     try {
       await login(identifier, password);
       navigate('/scanner');
-    } catch {
-      setError('Invalid Operator Badge ID or Terminal PIN');
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Invalid Operator Badge ID or Terminal PIN';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickConductor = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await login('conductor@seerpayanam.in', 'test123');
+      navigate('/scanner');
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -72,7 +86,7 @@ export default function ConductorLogin() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="e.g. conductor@crowdmove.in or OP-9821"
+                placeholder="e.g. conductor@seerpayanam.in or OP-9821"
                 required
               />
             </div>
@@ -96,11 +110,21 @@ export default function ConductorLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Zap className="w-4 h-4" />
               {loading ? 'Authorizing Handheld Terminal...' : 'Sign In to Conductor Scanner'}
               <ArrowRight className="w-4 h-4 ml-auto" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleQuickConductor}
+              disabled={loading}
+              className="w-full py-2.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <Zap className="w-3.5 h-3.5 text-cyan-600" />
+              1-Click Fast Conductor Sign In (OP-9821)
             </button>
           </form>
         </div>

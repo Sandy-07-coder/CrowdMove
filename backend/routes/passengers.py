@@ -1,4 +1,5 @@
 import datetime
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -82,14 +83,14 @@ async def scan_card(req: ScanRequest, db: Session = Depends(get_db)):
     if req.action == "board":
         if bus.current_passengers >= bus.total_capacity:
             return ScanResponse(success=False, message="Bus is at operational capacity",
-                                current_passengers=bus.current_passengers)
+                                current_passengers=bus.current_passengers, new_balance=round(card.balance, 2), bus_id=bus.id)
         if card.balance < BASE_FARE:
             return ScanResponse(success=False, message=f"Insufficient balance (₹{card.balance:.2f}). Recharge at depot.",
-                                current_passengers=bus.current_passengers)
+                                current_passengers=bus.current_passengers, new_balance=round(card.balance, 2), bus_id=bus.id)
 
         bus.current_passengers += 1
         bus.boarded_count += 1
-        card.balance -= BASE_FARE
+        card.balance = round(card.balance - BASE_FARE, 2)
 
         db.add(Transaction(card_id=card.id, amount=BASE_FARE, type="debit",
                            description=f"Boarded {bus.bus_number}"))
@@ -97,10 +98,10 @@ async def scan_card(req: ScanRequest, db: Session = Depends(get_db)):
                               stop_id=req.stop_id, action="board", fare=BASE_FARE))
         db.commit()
 
-        # Immediate WebSocket notification
+        # Immediate Non-blocking WebSocket broadcast
         pct = (bus.current_passengers / bus.total_capacity * 100) if bus.total_capacity > 0 else 0
         crowd = "green" if pct < 50 else "yellow" if pct < 75 else "orange" if pct < 90 else "red"
-        await manager.broadcast("bus_single_update", {
+        asyncio.create_task(manager.broadcast("bus_single_update", {
             "bus_id": bus.id,
             "bus_number": bus.bus_number,
             "current_passengers": bus.current_passengers,
@@ -109,10 +110,11 @@ async def scan_card(req: ScanRequest, db: Session = Depends(get_db)):
             "card_number": card.card_number,
             "new_balance": card.balance,
             "action": "board"
-        })
+        }))
 
         return ScanResponse(success=True, message=f"Boarding validated! ₹{BASE_FARE:.2f} deducted. Bal: ₹{card.balance:.2f}",
-                            current_passengers=bus.current_passengers, fare=BASE_FARE)
+                            current_passengers=bus.current_passengers, fare=BASE_FARE,
+                            new_balance=card.balance, bus_id=bus.id)
 
     elif req.action == "alight":
         if bus.current_passengers > 0:
@@ -123,21 +125,23 @@ async def scan_card(req: ScanRequest, db: Session = Depends(get_db)):
                               stop_id=req.stop_id, action="alight"))
         db.commit()
 
-        # Immediate WebSocket notification
+        # Immediate Non-blocking WebSocket broadcast
         pct = (bus.current_passengers / bus.total_capacity * 100) if bus.total_capacity > 0 else 0
         crowd = "green" if pct < 50 else "yellow" if pct < 75 else "orange" if pct < 90 else "red"
-        await manager.broadcast("bus_single_update", {
+        asyncio.create_task(manager.broadcast("bus_single_update", {
             "bus_id": bus.id,
             "bus_number": bus.bus_number,
             "current_passengers": bus.current_passengers,
             "occupancy_percent": round(pct, 1),
             "crowd_status": crowd,
             "card_number": card.card_number,
+            "new_balance": card.balance,
             "action": "alight"
-        })
+        }))
 
         return ScanResponse(success=True, message="Alighting recorded successfully",
-                            current_passengers=bus.current_passengers)
+                            current_passengers=bus.current_passengers, fare=0,
+                            new_balance=card.balance, bus_id=bus.id)
 
     return ScanResponse(success=False, message="Invalid action", current_passengers=0)
 
@@ -208,7 +212,7 @@ async def physical_hardware_tap_in(req: HardwareTapRequest, db: Session = Depend
 
     pct = (bus.current_passengers / bus.total_capacity * 100) if bus.total_capacity > 0 else 0
     crowd = "green" if pct < 50 else "yellow" if pct < 75 else "orange" if pct < 90 else "red"
-    await manager.broadcast("bus_single_update", {
+    asyncio.create_task(manager.broadcast("bus_single_update", {
         "bus_id": bus.id,
         "bus_number": bus.bus_number,
         "current_passengers": bus.current_passengers,
@@ -217,7 +221,7 @@ async def physical_hardware_tap_in(req: HardwareTapRequest, db: Session = Depend
         "card_number": card.card_number,
         "new_balance": card.balance,
         "action": "board"
-    })
+    }))
 
     return {
         "authorized": True,
@@ -251,14 +255,14 @@ async def physical_hardware_tap_out(req: HardwareTapRequest, db: Session = Depen
 
     pct = (bus.current_passengers / bus.total_capacity * 100) if bus.total_capacity > 0 else 0
     crowd = "green" if pct < 50 else "yellow" if pct < 75 else "orange" if pct < 90 else "red"
-    await manager.broadcast("bus_single_update", {
+    asyncio.create_task(manager.broadcast("bus_single_update", {
         "bus_id": bus.id,
         "bus_number": bus.bus_number,
         "current_passengers": bus.current_passengers,
         "occupancy_percent": round(pct, 1),
         "crowd_status": crowd,
         "action": "alight"
-    })
+    }))
 
     return {
         "authorized": True,

@@ -1,4 +1,4 @@
-# CrowdMove — Implementation Plan (Simulation Approach)
+# SEERPAYANAM — Implementation Plan (Simulation Approach)
 
 ## Tech Stack
 

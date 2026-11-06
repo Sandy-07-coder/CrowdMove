@@ -52,6 +52,16 @@ export function useSimulation(): UseSimulationReturn {
           case 'buses_update':
             setBuses(msg.data);
             break;
+          case 'bus_single_update':
+            if (msg.data && msg.data.bus_id) {
+              setBuses(prev => prev.map(b => b.id === msg.data.bus_id ? {
+                ...b,
+                current_passengers: msg.data.current_passengers,
+                occupancy_percent: msg.data.occupancy_percent ?? b.occupancy_percent,
+                crowd_status: msg.data.crowd_status ?? b.crowd_status,
+              } : b));
+            }
+            break;
           case 'stats_update':
             setStats(msg.data);
             break;

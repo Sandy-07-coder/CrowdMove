@@ -32,6 +32,7 @@ export default function PassengerDashboard() {
   const [isBoarded, setIsBoarded] = useState(false);
   const [currentBoardedBusNumber, setCurrentBoardedBusNumber] = useState<string>('');
   const [tapping, setTapping] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -62,10 +63,18 @@ export default function PassengerDashboard() {
     }
   }, [wsBuses]);
 
-  const refresh = () => {
-    loadCard();
-    busApi.list(true).then((r) => setBuses(r.data));
-    showToast('info', 'Refreshed live data');
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      loadCard();
+      const r = await busApi.list(true);
+      setBuses(r.data);
+      showToast('info', 'Refreshed live data');
+    } catch {
+      // ignore
+    } finally {
+      setTimeout(() => setRefreshing(false), 500);
+    }
   };
 
   const handleRecharge = async () => {
@@ -105,16 +114,61 @@ export default function PassengerDashboard() {
     try {
       const res = await passengerApi.scan(card.card_number, busId, actionType);
       if (res.data.success) {
-        showToast('success', res.data.message);
+        const fare = res.data.fare || (actionType === 'board' ? 10 : 0);
+        const updatedBal = res.data.new_balance !== undefined
+          ? res.data.new_balance
+          : (actionType === 'board' ? Number((card.balance - fare).toFixed(2)) : card.balance);
+
+        // 1. Instant Balance Deduction in State
+        setCard((prev) => (prev ? { ...prev, balance: updatedBal } : null));
+
+        // 2. Instant Bus Passenger Count Update
+        setBuses((prev) =>
+          prev.map((b) =>
+            b.id === busId
+              ? {
+                  ...b,
+                  current_passengers: res.data.current_passengers,
+                  boarded_count: actionType === 'board' ? b.boarded_count + 1 : b.boarded_count,
+                  alighted_count: actionType === 'alight' ? b.alighted_count + 1 : b.alighted_count,
+                }
+              : b
+          )
+        );
+
+        // 3. Instant Travel History Prepend
         if (actionType === 'board') {
           setIsBoarded(true);
           setCurrentBoardedBusNumber(busObj?.bus_number || 'Bus');
+          setTransactions((prev) => [
+            {
+              id: Date.now(),
+              amount: fare,
+              type: 'debit',
+              description: `Boarded ${busObj?.bus_number || 'Bus'}`,
+              created_at: new Date().toISOString(),
+            },
+            ...prev,
+          ]);
         } else {
           setIsBoarded(false);
           setCurrentBoardedBusNumber('');
+          setTransactions((prev) => [
+            {
+              id: Date.now(),
+              amount: 0,
+              type: 'debit',
+              description: `Alighted from ${busObj?.bus_number || 'Bus'}`,
+              created_at: new Date().toISOString(),
+            },
+            ...prev,
+          ]);
         }
+
+        showToast('success', res.data.message);
+
+        // 4. Background re-sync
         loadCard();
-        busApi.list(true).then((r) => setBuses(r.data));
       } else {
         showToast('error', res.data.message);
       }
@@ -148,27 +202,39 @@ export default function PassengerDashboard() {
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <RoleNavbar />
 
-      {/* Main Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+      {/* Main Header — positioned below RoleNavbar */}
+      <header className="bg-white border-b border-gray-200 shadow-xs sticky top-11 z-20">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-1.5">
-              <BusIcon className="w-5 h-5 text-emerald-600" /> TN-ITIS Passenger Pass
-            </h1>
-            <p className="text-xs text-gray-500">Commuter: {user?.name}</p>
-          </div>
+          <Link
+            to="/passenger"
+            title="SEERPAYANAM Passenger Pass"
+            className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="bg-emerald-600 p-1.5 rounded-lg text-white shadow-xs group-hover:shadow-sm transition-shadow">
+              <BusIcon className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-900 leading-tight">
+                SEERPAYANAM Pass
+              </h1>
+              <p className="text-[11px] text-gray-500">Commuter: {user?.name}</p>
+            </div>
+          </Link>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={refresh}
-              title="Refresh"
-              className="p-2 text-gray-500 hover:text-blue-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              disabled={refreshing}
+              title="Refresh Live Data"
+              className="p-2 text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-blue-600' : ''}`} />
             </button>
             <button
+              type="button"
               onClick={logout}
               title="Logout"
-              className="p-2 text-gray-500 hover:text-red-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>

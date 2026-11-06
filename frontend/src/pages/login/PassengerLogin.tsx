@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { CreditCard, Bus, ArrowRight, ShieldCheck, Zap, User } from 'lucide-react';
+import { CreditCard, ArrowRight, Zap, User } from 'lucide-react';
 
 const DEMO_COMMUTERS = [
   { name: 'Priya Muthukumar', card: 'TN-MTC-2026-0001', email: 'priya@gmail.com', passType: 'General Commuter Pass' },
@@ -24,8 +24,9 @@ export default function PassengerLogin() {
     try {
       await login(identifier, password);
       navigate('/passenger');
-    } catch {
-      setError('Invalid Smart Card Number, Email, or Password');
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Invalid Smart Card Number, Email, or Password';
+      setError(msg);
     } finally {
       setLoading(false);
     }

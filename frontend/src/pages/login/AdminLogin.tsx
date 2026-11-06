@@ -6,7 +6,7 @@ import { Shield, ArrowRight, Zap, Sparkles } from 'lucide-react';
 export default function AdminLogin() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@crowdmove.in');
+  const [email, setEmail] = useState('admin@seerpayanam.in');
   const [password, setPassword] = useState('test123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,8 +18,22 @@ export default function AdminLogin() {
     try {
       await login(email, password);
       navigate('/admin');
-    } catch {
-      setError('Invalid Administrative Credentials');
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Invalid Administrative Credentials';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickAdmin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await login('admin@seerpayanam.in', 'test123');
+      navigate('/admin');
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -72,7 +86,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="admin@crowdmove.in"
+                placeholder="admin@seerpayanam.in"
                 required
               />
             </div>
@@ -96,11 +110,21 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Zap className="w-4 h-4" />
               {loading ? 'Authenticating Clearance...' : 'Authenticate & Access Command Center'}
               <ArrowRight className="w-4 h-4 ml-auto" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleQuickAdmin}
+              disabled={loading}
+              className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+              1-Click Fast Admin Sign In
             </button>
           </form>
         </div>

@@ -1,4 +1,4 @@
-# TN-ITIS — Tamil Nadu Intelligent Transit Management System
+# SEERPAYANAM (TN-ITIS) — Tamil Nadu Intelligent Transit Management System
 ### AI-Powered Predictive Overcrowding, Demand-Supply Balancing & Multi-Modal Coordination System for Chennai (MTC, CMRL & SR)
 
 > **Hackathon Theme 4 Submission**: Intelligent Public Transportation Management System using real Chennai Metropolitan Transport Corporation (MTC) Electronic Ticketing Machine (ETM) datasets, Shapefiles, and Metro/Suburban rail networks.

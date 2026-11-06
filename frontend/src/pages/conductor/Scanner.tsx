@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { busApi, passengerApi, type Bus } from '../../api';
 import { useSimulation } from '../../hooks/useSimulation';
 import QrScanner from '../../components/QrScanner';
@@ -29,24 +29,33 @@ export default function ConductorScanner() {
   const [processing, setProcessing] = useState(false);
   const [manualCard, setManualCard] = useState('');
 
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
   const playChime = (success: boolean) => {
     try {
-      const ctx = new AudioContext();
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       gain.gain.value = 0.25;
       osc.connect(gain).connect(ctx.destination);
       if (success) {
         osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
         osc.start();
-        osc.stop(ctx.currentTime + 0.35);
+        osc.stop(ctx.currentTime + 0.28);
       } else {
         osc.frequency.setValueAtTime(220, ctx.currentTime);
-        osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(180, ctx.currentTime + 0.12);
         osc.start();
-        osc.stop(ctx.currentTime + 0.35);
+        osc.stop(ctx.currentTime + 0.28);
       }
     } catch {
       // AudioContext unavailable
@@ -98,6 +107,11 @@ export default function ConductorScanner() {
         setSelectedBus((prev) =>
           prev ? { ...prev, current_passengers: res.data.current_passengers } : null
         );
+        setBuses((prev) =>
+          prev.map((b) =>
+            b.id === selectedBus.id ? { ...b, current_passengers: res.data.current_passengers } : b
+          )
+        );
       }
     } catch {
       playChime(false);
@@ -123,17 +137,25 @@ export default function ConductorScanner() {
       <RoleNavbar />
 
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm px-4 py-4">
+      <header className="bg-white border-b border-gray-200 shadow-sm px-4 py-3 sticky top-11 z-20">
         <div className="max-w-xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <ScanLine className="w-6 h-6 text-emerald-600" />
-              <h1 className="text-lg font-bold text-gray-900">Smart Card & QR Scanner</h1>
+          <Link
+            to="/scanner"
+            title="SEERPAYANAM Conductor ETM"
+            className="flex items-center gap-2.5 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-700 shadow-xs group-hover:shadow-sm transition-shadow">
+              <ScanLine className="w-5 h-5 text-emerald-600" />
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Electronic Ticketing Machine (ETM) / Turnstile Validation Point
-            </p>
-          </div>
+            <div>
+              <h1 className="text-base font-bold text-gray-900 leading-tight">
+                SEERPAYANAM ETM Scanner
+              </h1>
+              <p className="text-[11px] text-gray-500">
+                MTC Onboard Electronic Ticketing Machine
+              </p>
+            </div>
+          </Link>
 
           {/* Active Bus Selector Dropdown */}
           <div className="flex items-center gap-2">

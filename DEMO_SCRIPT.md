@@ -1,4 +1,4 @@
-# TN-ITIS — Hackathon 5-Minute Presentation Script
+# SEERPAYANAM (TN-ITIS) — Hackathon 5-Minute Presentation Script
 
 ## Pre-Demo Setup
 

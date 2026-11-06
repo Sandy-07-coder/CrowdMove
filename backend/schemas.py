@@ -102,6 +102,8 @@ class ScanResponse(BaseModel):
     message: str
     current_passengers: int
     fare: float = 0
+    new_balance: Optional[float] = None
+    bus_id: Optional[int] = None
 
 
 class AlertOut(BaseModel):

@@ -19,23 +19,23 @@ def seed_database(db: Session, force: bool = False):
         db.query(User).delete()
         db.commit()
 
-    admin = User(name="MTC Central Transit Controller", email="admin@crowdmove.in", phone="9876543210",
+    admin = User(name="MTC Central Transit Controller", email="admin@seerpayanam.in", phone="9876543210",
                  password_hash=hash_password("test123"), role="admin")
     db.add(admin)
 
     drivers_data = [
-        ("Rajesh Kumar (Badge #D51192)", "rajesh@crowdmove.in", "9876543211"),
-        ("Suresh Babu (Badge #D48012)", "suresh@crowdmove.in", "9876543212"),
-        ("Murugan S (Badge #D15904)", "murugan@crowdmove.in", "9876543213"),
-        ("Karthik R (Badge #D57901)", "karthik@crowdmove.in", "9876543214"),
-        ("Senthil V (Badge #D51009)", "senthil@crowdmove.in", "9876543215"),
-        ("Dhanush M (Badge #D66021)", "dhanush@crowdmove.in", "9876543216"),
-        ("Prabhu K (Badge #D11405)", "prabhu@crowdmove.in", "9876543217"),
-        ("Vignesh A (Badge #D01802)", "vignesh@crowdmove.in", "9876543218"),
-        ("Arjun N (Badge #D02107)", "arjun@crowdmove.in", "9876543219"),
-        ("Manoj P (Badge #D07015)", "manoj@crowdmove.in", "9876543220"),
-        ("Saravanan T (Badge #D01208)", "saravanan@crowdmove.in", "9876543221"),
-        ("Anbazhagan M (Badge #D00503)", "anbu@crowdmove.in", "9876543222"),
+        ("Rajesh Kumar (Badge #D51192)", "rajesh@seerpayanam.in", "9876543211"),
+        ("Suresh Babu (Badge #D48012)", "suresh@seerpayanam.in", "9876543212"),
+        ("Murugan S (Badge #D15904)", "murugan@seerpayanam.in", "9876543213"),
+        ("Karthik R (Badge #D57901)", "karthik@seerpayanam.in", "9876543214"),
+        ("Senthil V (Badge #D51009)", "senthil@seerpayanam.in", "9876543215"),
+        ("Dhanush M (Badge #D66021)", "dhanush@seerpayanam.in", "9876543216"),
+        ("Prabhu K (Badge #D11405)", "prabhu@seerpayanam.in", "9876543217"),
+        ("Vignesh A (Badge #D01802)", "vignesh@seerpayanam.in", "9876543218"),
+        ("Arjun N (Badge #D02107)", "arjun@seerpayanam.in", "9876543219"),
+        ("Manoj P (Badge #D07015)", "manoj@seerpayanam.in", "9876543220"),
+        ("Saravanan T (Badge #D01208)", "saravanan@seerpayanam.in", "9876543221"),
+        ("Anbazhagan M (Badge #D00503)", "anbu@seerpayanam.in", "9876543222"),
     ]
     drivers = []
     for name, email, phone in drivers_data:
@@ -43,6 +43,10 @@ def seed_database(db: Session, force: bool = False):
                  password_hash=hash_password("test123"), role="driver")
         db.add(d)
         drivers.append(d)
+
+    conductor = User(name="Deepa Krishnan (Conductor #OP-9821)", email="conductor@seerpayanam.in", phone="9000000009",
+                     password_hash=hash_password("test123"), role="conductor")
+    db.add(conductor)
 
     passengers_data = [
         ("Priya Muthukumar (Smart Pass)", "priya@gmail.com", "9000000001"),
@@ -53,7 +57,6 @@ def seed_database(db: Session, force: bool = False):
         ("Ganesh Thangavel (Suburban)", "ganesh@gmail.com", "9000000006"),
         ("Meena Padmanabhan (Daily)", "meena@gmail.com", "9000000007"),
         ("Ravi Velu (IT Corridor)", "ravi@gmail.com", "9000000008"),
-        ("Deepa Krishnan (Conductor)", "conductor@crowdmove.in", "9000000009"),
         ("Kumar Swaminathan (Commuter)", "kumar@gmail.com", "9000000010"),
     ]
     passengers = []

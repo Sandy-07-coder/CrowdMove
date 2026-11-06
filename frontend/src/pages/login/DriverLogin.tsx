@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Navigation, Bus, ArrowRight, Zap, Shield, KeyRound } from 'lucide-react';
+import { Navigation, Bus, ArrowRight, Zap } from 'lucide-react';
 
 const DEMO_DRIVERS = [
-  { name: 'Rajesh Kumar', badge: 'D51192', email: 'rajesh@crowdmove.in', bus: 'Route 159 (Bus 01)' },
-  { name: 'Suresh Babu', badge: 'D48012', email: 'suresh@crowdmove.in', bus: 'Route 48C (Bus 01)' },
-  { name: 'Murugan S', badge: 'D15904', email: 'murugan@crowdmove.in', bus: 'Route 579C (Bus 01)' },
+  { name: 'Rajesh Kumar', badge: 'D51192', email: 'rajesh@seerpayanam.in', bus: 'Route 159 (Bus 01)' },
+  { name: 'Suresh Babu', badge: 'D48012', email: 'suresh@seerpayanam.in', bus: 'Route 48C (Bus 01)' },
+  { name: 'Murugan S', badge: 'D15904', email: 'murugan@seerpayanam.in', bus: 'Route 579C (Bus 01)' },
 ];
 
 export default function DriverLogin() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [identifier, setIdentifier] = useState('rajesh@crowdmove.in');
+  const [identifier, setIdentifier] = useState('rajesh@seerpayanam.in');
   const [password, setPassword] = useState('test123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,8 +24,9 @@ export default function DriverLogin() {
     try {
       await login(identifier, password);
       navigate('/driver');
-    } catch {
-      setError('Invalid Driver Badge ID, Email, or PIN');
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Invalid Driver Badge ID, Email, or PIN';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -95,7 +96,7 @@ export default function DriverLogin() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                placeholder="e.g. rajesh@crowdmove.in or D51192"
+                placeholder="e.g. rajesh@seerpayanam.in or D51192"
                 required
               />
             </div>

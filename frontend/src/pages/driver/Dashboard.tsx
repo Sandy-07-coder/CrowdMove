@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { busApi, type Bus } from '../../api';
 import { useSimulation } from '../../hooks/useSimulation';
@@ -195,8 +196,12 @@ export default function DriverDashboard() {
       {/* Driver HUD Sub-Header & Bus Selector */}
       <header className="px-4 py-3 bg-white/95 border-b border-gray-200 sticky top-12 z-20 backdrop-blur shadow-sm">
         <div className="max-w-xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl shadow-md ${isCritical ? 'bg-red-600 animate-pulse' : 'bg-blue-600'}`}>
+          <Link
+            to="/driver"
+            title="SEERPAYANAM Driver HUD"
+            className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer group"
+          >
+            <div className={`p-2 rounded-xl shadow-md group-hover:shadow-lg transition-shadow ${isCritical ? 'bg-red-600 animate-pulse' : 'bg-blue-600'}`}>
               <Navigation className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -214,7 +219,7 @@ export default function DriverDashboard() {
                 </p>
               )}
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             <select
